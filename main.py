@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import sys
+from scrape_profile import scrape_profile
 
 import re
 def login(driver) :
@@ -30,50 +31,37 @@ def login(driver) :
         EC.presence_of_element_located((By.ID, "global-nav"))
     )
     
-    # For demonstration purposes, let's print the page title
-    # print("Page title:", driver.title)
 
-    # Enter a search query
-    # search_bar.send_keys("Bill Gates")
-    
 def find_users_with_job(driver) :
-     # At this point, you are logged in, and you can continue with your automated tasks
-
     driver.get("https://www.google.com")
 
-    # locate search form by_name
     search_query = driver.find_element(By.NAME, "q")
 
-    # send_keys() to simulate the search text key strokes
     search_query.send_keys('site:linkedin.com/in/ AND "python developer" AND "London"')
     search_query.send_keys(Keys.RETURN)
-    # Wait for the search results to load (you may adjust the timeout)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "search")))
     
     html_content = driver.page_source
 
-    # print(html_content)
-    find_links(html_content)
+    profile_links = find_links(html_content, r'https://\w+\.linkedin\.com/in/\w+')
     
-def find_links(html_content) :
-    regex_pattern = r'https://\w+\.linkedin\.com/in/\w+'
+    return profile_links
+
+def find_links(html_content, regex_pattern) :
     matches = re.findall(regex_pattern, html_content)
 
-    for match in matches:
-        print()
-        print(match)
-   
-    # first_result = driver.find_element(By.CSS_SELECTOR, "h3")
-    # first_result.click()
+    unique_matches = list(set(matches))
+
+    return unique_matches
 
 if __name__ == "__main__" :
 
     # Initialize the WebDriver (Chrome)
     driver = webdriver.Chrome()
 
-    # login(driver)
+    login(driver)
+    num_profiles = 5
+    profile_links = find_users_with_job(driver)
 
-    find_users_with_job(driver)
-
-
+    scrape_profile(driver, profile_links)
     driver.quit()
