@@ -11,30 +11,32 @@ import json
 import os
 # https://realpython.com/python-send-email/
 def scrape_profile(driver, profile_urls, file_name) :
-    for profile_url in profile_urls :
-        driver.get(profile_url)
-        wait = WebDriverWait(driver, 10)  # Adjust the timeout as needed
-        # Get the title of the webpage
-        current_url = driver.current_url
+    if file_name != "secret_scrape.json" :
+        for profile_url in profile_urls :
+            driver.get(profile_url)
+            wait = WebDriverWait(driver, 10)  # Adjust the timeout as needed
+            # Get the title of the webpage
+            current_url = driver.current_url
 
 
-        # Check if "404" is in the title
-        if "404" in current_url :
-            continue
-        else :
-            element = wait.until(EC.presence_of_element_located((By.XPATH, "//*[text()='Contact info']")))
-            element.click()
-            
-            email, phone = find_contact_info(driver)
-            append_profile_to_json(file_name, profile_url, email, phone)
-        
-            
+            # Check if "404" is in the title
+            if "404" in current_url :
+                continue
+            else :
+                element = wait.until(EC.presence_of_element_located((By.XPATH, "//*[text()='Contact info']")))
+                element.click()
+                
+                email, phone = find_contact_info(driver)
+                append_profile_to_json(file_name, profile_url, email, phone)
     
+    else :
+            
+        driver.get("https://www.linkedin.com/in/test-tester-3538a82ab/overlay/contact-info/")
 
-    # driver.get("https://www.linkedin.com/in/test-tester-3538a82ab/overlay/contact-info/")
-    
-    # find_contact_info(driver)
-    # driver.quit()
+        find_contact_info(driver)
+        email, phone = find_contact_info(driver)
+        append_profile_to_json(file_name, "https://www.linkedin.com/in/test-tester-3538a82ab/overlay/contact-info/", email, phone)
+    driver.quit()
 
 
 def append_profile_to_json(file_name, link, email, phone):
