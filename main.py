@@ -4,6 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import sys
+
+import re
 def login(driver) :
     # Open LinkedIn login page
     driver.get("https://www.linkedin.com/uas/login")
@@ -37,14 +39,6 @@ def login(driver) :
 def find_users_with_job(driver) :
      # At this point, you are logged in, and you can continue with your automated tasks
 
-    # Locate the search bar by its class name
-    search_bar = driver.find_element(By.CLASS_NAME, "search-global-typeahead__input")
-
-    
-
-    # Simulate pressing Enter to perform the search
-    search_bar.send_keys(Keys.RETURN)
-
     driver.get("https://www.google.com")
 
     # locate search form by_name
@@ -56,12 +50,19 @@ def find_users_with_job(driver) :
     # Wait for the search results to load (you may adjust the timeout)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "search")))
     
-    results = driver.find_elements_by_css_selector('div.g')
+    html_content = driver.page_source
 
-    # urls = [result.get_attribute('href') for result in result_elements]
+    # print(html_content)
+    find_links(html_content)
     
-    
-    print(results)
+def find_links(html_content) :
+    regex_pattern = r'https://\w+\.linkedin\.com/in/\w+'
+    matches = re.findall(regex_pattern, html_content)
+
+    for match in matches:
+        print()
+        print(match)
+   
     # first_result = driver.find_element(By.CSS_SELECTOR, "h3")
     # first_result.click()
 
@@ -70,7 +71,7 @@ if __name__ == "__main__" :
     # Initialize the WebDriver (Chrome)
     driver = webdriver.Chrome()
 
-    login(driver)
+    # login(driver)
 
     find_users_with_job(driver)
 
