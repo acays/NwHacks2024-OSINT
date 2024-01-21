@@ -34,7 +34,6 @@ def login(driver) :
 
 def find_users_with_job(driver, num_profiles_r) :
     driver.get("https://www.google.com")
-
     search_query = driver.find_element(By.NAME, "q")
 
     search_query.send_keys('site:linkedin.com/in/ AND "python developer" AND "London"')
